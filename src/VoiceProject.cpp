@@ -30,10 +30,11 @@
 
 #ifdef QT_QML_DEBUG
 #include <QtQuick>
+#include <QDebug>
 #endif
 
 #include <sailfishapp.h>
-
+#include "hound_driver.h"
 
 int main(int argc, char *argv[])
 {
@@ -46,6 +47,33 @@ int main(int argc, char *argv[])
     //
     // To display the view, call "show()" (will show fullscreen on device).
 
+    const char *client_id = "j2MQFIFkmjxAl0EsdtxLBQ==";
+    const char *client_key = "f1Le4GzmvB9DBj-gEnOdFGFTiFT5wEbYWMtHiPTes7-nry1PaqfS2Ki7h1ZAmi8XE_--78pg54lAhX2lcEQMTA==";
+    const char *user_id = "VoiceActor";
+    const char *text_request_url_base = HoundCloudRequester::default_text_request_url_base();
+    const char *voice_request_url_base = HoundCloudRequester::default_voice_request_url_base();
+
+    if (strlen(client_key) != 88)
+      {
+        fprintf(stderr,
+                "Error: The client key must be 88 characters long, but it is "
+                "%lu characters long.\n", (unsigned long)(strlen(client_key)));
+        return 1;
+      }
+
+    init_o_integer_module();
+    qDebug()<<"BEFORE REQUESTER";
+
+
+    HoundCloudRequester requester(
+                client_id, client_key, user_id,
+                text_request_url_base, voice_request_url_base);
+    int result = hound_driver(&requester);
+
+
+
+    cleanup_o_integer_module();
+    qDebug()<<"finished";
+
     return SailfishApp::main(argc, argv);
 }
-
