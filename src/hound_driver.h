@@ -25,4 +25,22 @@ extern "C"
 class HoundRequester;
 extern int hound_driver(HoundRequester *requester);
 
+class LocalPartialHandler : public HoundRequester::PartialHandler
+{
+    private:
+        bool show_transcript;
+
+    public:
+        LocalPartialHandler(bool show_transcript) : show_transcript(show_transcript)  { }
+        ~LocalPartialHandler(void)  { }
+
+        void handle(HoundPartialTranscriptJSON *partial)
+        {
+            if (show_transcript)
+            {
+                fprintf(stderr, "Partial Transcript: `%s'.\n", partial->getPartialTranscript().c_str());
+            }
+        }
+};
+
 #endif /* HOUND_DRIVER_H */

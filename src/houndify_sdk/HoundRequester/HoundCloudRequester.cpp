@@ -21,6 +21,11 @@
 #include "HoundHMACSHA256.h"
 #include "HoundUnixTimeStamp.h"
 #include "HoundSharedDoneFlag.h"
+#include <QDebug>
+#include <iostream>
+
+
+using std::cout;
 
 
 static void throw_error_result(const char *url, const char *e1,
@@ -251,20 +256,21 @@ class ResultHandler : public FetchHandler
       {
         shared_done_flag->wait_until_done();
       }
-    HoundServerJSON *get_result(void)
-      {
+        HoundServerJSON *get_result(void)
+        {
+        std::cout << error_message.str();
         if (!is_good)
-          {
+        {
             std::string message_string = error_message.str();
             const char *message_chars = message_string.c_str();
             char *message_copy = (char *)(malloc(strlen(message_chars) + 1));
             strcpy(message_copy, message_chars);
             throw message_chars;
-          }
+        }
         if (result == NULL)
             throw "No valid JSON was returned from the server.";
-        return result;
-      }
+            return result;
+        }
   };
 
 class LocalVoiceRequest : public HoundRequester::VoiceRequest

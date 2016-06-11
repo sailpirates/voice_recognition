@@ -2,6 +2,7 @@
 
 #include <QDebug>
 
+
 extern int hound_driver(HoundRequester *requester)
 {
     bool done = false;
@@ -10,32 +11,34 @@ extern int hound_driver(HoundRequester *requester)
 
     char session_id[41];
     for (size_t num = 0; num < 10; ++num)
-      {
+    {
         char bits[3];
         bits[0] = (char)(rand());
         bits[1] = (char)(rand());
         bits[2] = (char)(rand());
         base64url_encode_three(&(session_id[num * 4]), &(bits[0]));
-      }
+    }
     session_id[40] = 0;
 
     while (true)
-      {
+    {
         std::string line = "HELLO WORLD"; // get_user_input_line(&done);
         if (done)
+        {
             break;
+        }
 
         RequestInfoJSON *request_info = new RequestInfoJSON();
         request_info->setUnitPreference(RequestInfoJSON::UnitPreference_US);
         char request_id[41];
         for (size_t num = 0; num < 10; ++num)
-          {
+        {
             char bits[3];
             bits[0] = (char)(rand());
             bits[1] = (char)(rand());
             bits[2] = (char)(rand());
             base64url_encode_three(&(request_id[num * 4]), &(bits[0]));
-          }
+        }
         request_id[40] = 0;
         request_info->setRequestID(request_id);
         request_info->setSessionID(session_id);
@@ -45,62 +48,49 @@ extern int hound_driver(HoundRequester *requester)
         request_info->setClientVersion(client_version);
 
         HoundServerJSON *hound_result;
-        if ((strncmp(line.c_str(), "-audio ", 7) == 0) ||
-            (strncmp(line.c_str(), "-transcript-audio ", 18) == 0) ||
-            (strncmp(line.c_str(), "-slow-transcript-audio ", 23) == 0))
-          {
+        if ((strncmp(line.c_str(), "-audio ", 7) != 0))
+        {
             bool show_transcript =
                     ((strncmp(line.c_str(), "-transcript-audio ", 18) == 0) ||
                      (strncmp(line.c_str(), "-slow-transcript-audio ", 23) ==
                       0));
-            class LocalPartialHandler : public HoundRequester::PartialHandler
-              {
-              private:
-                bool show_transcript;
 
-              public:
-                LocalPartialHandler(bool show_transcript) :
-                        show_transcript(show_transcript)  { }
-                ~LocalPartialHandler(void)  { }
-
-                void handle(HoundPartialTranscriptJSON *partial)
-                  {
-                    if (show_transcript)
-                      {
-                        fprintf(stderr, "Partial Transcript: `%s'.\n",
-                                partial->getPartialTranscript().c_str());
-                      }
-                  }
-              };
             LocalPartialHandler partial_handler(show_transcript);
-            HoundRequester::VoiceRequest *request =
-                    requester->start_voice_request(conversation_state,
-                            request_info, &partial_handler);
-            const char *file_name = &(line.c_str()[0]);
-            while (*file_name != ' ')
-                ++file_name;
-            ++file_name;
+            HoundRequester::VoiceRequest *request = requester->start_voice_request(
+                conversation_state, request_info, &partial_handler
+            );
+//            const char *file_name = &(line.c_str()[0]);
+//            while (*file_name != ' ')
+//            {
+//                ++file_name;
+//            }
+//            ++file_name;
+            const char* file_name = "/home/nemo/Downloads/Recordings/recording-20160611235419.oga";
             FILE *audio_fp = fopen(file_name, "rb");
             if (audio_fp == NULL)
-              {
+            {
                 fprintf(stderr, "Error trying to open audio file `%s': %s\n",
                         file_name, strerror(errno));
                 return 1;
-              }
+            }
+
+            #define CHUNK_BYTE_COUNT 2052
             while (true)
-              {
-#define CHUNK_BYTE_COUNT 2052
+            {
                 unsigned char buffer[CHUNK_BYTE_COUNT];
-                size_t byte_count =
-                        fread(&(buffer[0]), 1, CHUNK_BYTE_COUNT, audio_fp);
+                size_t byte_count = fread(&(buffer[0]), 1, CHUNK_BYTE_COUNT, audio_fp);
                 if (byte_count > 0)
+                {
                     request->add_audio(byte_count, &(buffer[0]));
-                if (byte_count < CHUNK_BYTE_COUNT)
+                }
+                if (byte_count < CHUNK_BYTE_COUNT) {
                     break;
-#undef CHUNK_BYTE_COUNT
-              }
+                }
+            }
+            #undef CHUNK_BYTE_COUNT
             fclose(audio_fp);
             hound_result = request->finish();
+
             if (hound_result != NULL)
                 hound_result->add_reference();
             delete request;
