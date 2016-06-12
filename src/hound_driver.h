@@ -22,8 +22,11 @@ extern "C"
 #include "HoundRequester.h"
 #include "Fetch.h"
 
+#include <QString>
+#include <QByteArray>
+
 class HoundRequester;
-extern int hound_driver(HoundRequester *requester);
+extern QByteArray hound_driver(QString audioUrl);
 
 class LocalPartialHandler : public HoundRequester::PartialHandler
 {

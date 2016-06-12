@@ -15,7 +15,8 @@ TARGET = VoiceProject
 CONFIG += sailfishapp
 
 SOURCES += src/VoiceProject.cpp \
-    src/hound_driver.cpp
+    src/hound_driver.cpp \
+    src/recorder.cpp
 
 OTHER_FILES += qml/VoiceProject.qml \
     qml/cover/CoverPage.qml \
@@ -133,7 +134,8 @@ HEADERS +=  $$PWD/src/houndify_sdk/Common/RegEx.h \
             $$PWD/src/houndify_sdk/SalmonEye/unicode.h \
             $$PWD/src/houndify_sdk/SampleCppClient/sample_hound_driver.h \
             $$PWD/src/houndify_sdk/SampleCppClient/sample_hound_driver_system_dependent.h \
-    src/hound_driver.h
+    src/hound_driver.h \
+    src/recorder.h
 
 SOURCES +=  $$PWD/src/houndify_sdk/GoldenRetriever/Fetch.cpp \
             $$PWD/src/houndify_sdk/GoldenRetriever/FetchEnable.cpp \
@@ -200,3 +202,4 @@ TRANSLATIONS += translations/VoiceProject-de.ts
 include(src/houndify_sdk/houndify.pri)
 
 LIBS += -lcrypto -lssl
+QT += multimedia network

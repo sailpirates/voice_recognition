@@ -30,10 +30,22 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
-
+import org.sailpirates.components 1.0
+import QtMultimedia 5.0
 
 Page {
     id: page
+
+    AudioRecorder{
+        id: recorder
+        onTextCommandChanged: {
+            console.log(textCommand)
+            textField.text = textCommand
+        }
+    }
+
+    MediaPlayer {
+    }
 
     // To enable PullDownMenu, place our content in a SilicaFlickable
     SilicaFlickable {
@@ -42,12 +54,31 @@ Page {
         // Place our content in a Column.  The PageHeader is always placed at the top
         // of the page, followed by our content.
         TextField {
+            id: text
             anchors.bottom: parent.bottom
             width: parent.width
-            label: "Type here"
-            placeholderText: "Type here"
+            label: "Type command..."
+            placeholderText: "Type command"
+        }
+
+        TextField {
+            id: textField
+            anchors.top: parent.top
+            width: parent.width
+            placeholderText: recorder.textCommand
+        }
+
+        Button {
+            anchors.bottom: text.top
+            onClicked: {
+                if (recorder.recording) {
+                    console.log('STOP RECORDING');
+                    recorder.stop();
+                } else {
+                    console.log('START RECORDING');
+                    recorder.record();
+                }
+            }
         }
     }
 }
-
-
