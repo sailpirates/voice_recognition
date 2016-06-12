@@ -42,9 +42,18 @@ Page {
             console.log(textCommand)
             textField.text = textCommand
         }
+
+        onSynthesizedAudioURLChanged: {
+            commandMediaPlayer.source = synthesizedAudioURL
+        }
     }
 
     MediaPlayer {
+        id: commandMediaPlayer
+
+        onSourceChanged: {
+            commandMediaPlayer.play();
+        }
     }
 
     // To enable PullDownMenu, place our content in a SilicaFlickable

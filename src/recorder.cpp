@@ -9,6 +9,10 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QProcess>
+#include <QByteArray>
+#include <QBuffer>
+#include <QMediaContent>
 
 #include "hound_driver.h"
 
@@ -58,6 +62,11 @@ QString AudioRecorder::getTextCommand()
     return textCommand;
 }
 
+QString AudioRecorder::getSynthesizedAudioURL()
+{
+    return synthesizedAudioURL;
+}
+
 void AudioRecorder :: record() {
     QDateTime currentDate = QDateTime::currentDateTime();
     QString location = AUDIO_FOLDER + "recording-" + currentDate.toString("yyyyMMddHHmmss") + ".flac";
@@ -99,8 +108,10 @@ void AudioRecorder :: stop() {
         speechToText(audioUrl);
         emit textCommandChanged();
     }
+    synthesizedAudioURL = "https://506cd4bb-67e7-43dc-850a-e612ba3f7c67:VlmbQGTglXMe@stream.watsonplatform.net/text-to-speech/api/v1/synthesize?accept=audio/wav&text=\"You said %1\"&voice=en-US_AllisonVoice";
+    synthesizedAudioURL = synthesizedAudioURL.arg(textCommand);
+    emit synthesizedAudioURLChanged();
 }
-
 
 QString AudioRecorder::speechToText(QUrl audioUrl) {
     QByteArray curlRes = hound_driver(audioUrl.toString());
